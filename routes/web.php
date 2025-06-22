@@ -42,6 +42,9 @@ Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
 
     // Melihat riwayat peminjaman per pengguna
     Route::get('/users/{user}/borrowings', [UserController::class, 'borrowings'])->name('users.borrowings');
+
+    // ✅ Route tambahan untuk mengembalikan buku
+    Route::post('/lendings/{lending}/return', [LendingController::class, 'returnBook'])->name('lendings.return');
 });
 
 // ------------------------

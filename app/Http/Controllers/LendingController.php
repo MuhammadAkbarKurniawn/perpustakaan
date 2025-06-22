@@ -91,5 +91,7 @@ class LendingController extends Controller
 
         return redirect()->route('lendings.index')->with('success', 'Data peminjaman berhasil dihapus.');
     }
+
+    
     
 }
