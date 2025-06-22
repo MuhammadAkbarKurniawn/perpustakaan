@@ -136,13 +136,14 @@
                                         <h5 class="modal-title">Perpanjang Jatuh Tempo</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                                     </div>
-                                    <form action="{{ route('lendings.index', $lend->id) }}" method="POST">
-                                        @csrf @method('PATCH')
+                                    <form action="{{ route('lendings.extend', $lend->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH')
                                         <div class="modal-body">
                                             <div class="mb-3">
                                                 <label for="due_at" class="form-label">Tanggal Baru</label>
                                                 <input type="date" class="form-control" id="due_at" name="due_at" 
-                                                       value="{{ \Carbon\Carbon::parse($lend->due_at)->format('Y-m-d') }}" min="{{ date('Y-m-d') }}">
+                                                    value="{{ \Carbon\Carbon::parse($lend->due_at)->format('Y-m-d') }}" min="{{ date('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -150,6 +151,7 @@
                                             <button type="submit" class="btn btn-sm btn-primary">Simpan</button>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                         </div>

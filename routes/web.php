@@ -17,7 +17,7 @@ Route::get('/', function () {
 });
 
 // ------------------------
-// Dashboard (akses setelah login dan verifikasi email)
+// Dashboard (login + verifikasi email)
 // ------------------------
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -27,29 +27,33 @@ Route::get('/dashboard', function () {
 // Admin & Librarian Routes
 // ------------------------
 Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
-    // Dashboard admin
+
+    // Dashboard admin/librarian
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Resource routes (CRUD)
+    // CRUD: Users, Books, Lendings, Roles
     Route::resource('users', UserController::class);
-    Route::resource('books', BookController::class); // CRUD untuk admin/librarian
+    Route::resource('books', BookController::class);
     Route::resource('lendings', LendingController::class);
     Route::resource('roles', RoleController::class);
 
-    // Role & permission management
+    // Manajemen role & permission pengguna
     Route::get('/user-role', [UserRoleController::class, 'index'])->name('admin.user_role.index');
-    Route::post('/user-role', [UserRoleController::class, 'assign'])->name('admin.user_role.assign');
+    Route::get('/user-role/{user}/edit', [UserRoleController::class, 'edit'])->name('admin.user_role.edit');
+    Route::put('/user-role/{user}', [UserRoleController::class, 'update'])->name('admin.user_role.update');
 
-    // Melihat riwayat peminjaman per pengguna
+    // Lihat riwayat peminjaman user
     Route::get('/users/{user}/borrowings', [UserController::class, 'borrowings'])->name('users.borrowings');
 
-    // ✅ Route tambahan untuk mengembalikan buku
+    // Pengembalian buku
     Route::post('/lendings/{lending}/return', [LendingController::class, 'returnBook'])->name('lendings.return');
+
+    // Perpanjangan jatuh tempo peminjaman
+    Route::patch('/lendings/{lending}/extend', [LendingController::class, 'extend'])->name('lendings.extend');
 });
 
 // ------------------------
-// Route yang dapat diakses oleh admin, librarian, dan member
-// (khusus untuk melihat daftar buku)
+// Admin, Librarian, Member - Lihat Daftar Buku
 // ------------------------
 Route::middleware(['auth', 'role:admin|librarian|member'])->get('/books', [BookController::class, 'index'])->name('books.index');
 
@@ -57,12 +61,11 @@ Route::middleware(['auth', 'role:admin|librarian|member'])->get('/books', [BookC
 // Member-only Routes
 // ------------------------
 Route::middleware(['auth', 'role:member'])->group(function () {
-    // Buku yang sedang dipinjam oleh member ini sendiri
     Route::get('/lendings/mine', [LendingController::class, 'myBorrowedBooks'])->name('lendings.mine');
 });
 
 // ------------------------
-// Profile Routes (semua yang login)
+// Profile Routes (semua login user)
 // ------------------------
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -71,6 +74,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // ------------------------
-// Auth Routes (Laravel Breeze / Fortify)
+// Auth Routes (Breeze / Fortify)
 // ------------------------
 require __DIR__.'/auth.php';

@@ -92,6 +92,19 @@ class LendingController extends Controller
         return redirect()->route('lendings.index')->with('success', 'Data peminjaman berhasil dihapus.');
     }
 
+    public function extend(Request $request, $id)
+    {
+        $request->validate([
+            'due_at' => 'required|date|after_or_equal:today',
+        ]);
+
+        $lending = \App\Models\LendingRecord::findOrFail($id);
+        $lending->due_at = $request->due_at;
+        $lending->save();
+
+        return redirect()->route('lendings.index')->with('success', 'Tanggal jatuh tempo berhasil diperpanjang.');
+    }
+
     
     
 }
