@@ -25,19 +25,19 @@ class RoleController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|unique:roles,name',
             'permissions' => 'array|nullable',
-            'permissions.*' => 'exists:permissions,id',
+            'permissions.*' => 'exists:permissions,name', // ✅ sudah diperbaiki
         ]);
 
         $role = Role::create(['name' => $validated['name']]);
         $role->syncPermissions($validated['permissions'] ?? []);
 
-        return redirect()->route('roles.index')->with('success', 'Role created successfully.');
+        return redirect()->route('roles.index')->with('success', 'Peran berhasil dibuat.');
     }
 
     public function edit(Role $role)
     {
         $permissions = Permission::all();
-        $rolePermissions = $role->permissions->pluck('id')->toArray();
+        $rolePermissions = $role->permissions->pluck('name')->toArray(); // name, bukan id
         return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
@@ -46,18 +46,18 @@ class RoleController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|unique:roles,name,' . $role->id,
             'permissions' => 'array|nullable',
-            'permissions.*' => 'exists:permissions,id',
+            'permissions.*' => 'exists:permissions,name', // ✅ pastikan konsisten dengan name
         ]);
 
         $role->update(['name' => $validated['name']]);
         $role->syncPermissions($validated['permissions'] ?? []);
 
-        return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
+        return redirect()->route('roles.index')->with('success', 'Peran berhasil diperbarui.');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
+        return redirect()->route('roles.index')->with('success', 'Peran berhasil dihapus.');
     }
 }

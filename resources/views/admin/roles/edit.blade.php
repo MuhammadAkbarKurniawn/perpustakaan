@@ -8,6 +8,11 @@
         @csrf @method('PUT')
 
         <div class="mb-3">
+            <label for="name" class="form-label">Nama Peran</label>
+            <input type="text" name="name" class="form-control" value="{{ $role->name }}" required>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label">Perbarui Izin Akses</label>
             <div class="row">
                 @foreach($permissions as $perm)

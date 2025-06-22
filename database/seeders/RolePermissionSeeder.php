@@ -18,9 +18,9 @@ class RolePermissionSeeder extends Seeder
 
         // Create permissions
         $permissions = [
-            'manage books',
-            'lend books',
-            'view reports',
+            'manajemen buku',
+        'peminjaman buku',
+        'melihat laporan',
         ];
 
         foreach ($permissions as $permission) {
