@@ -48,4 +48,14 @@ class User extends Authenticatable
     {
         return $this->morphToMany(Permission::class, 'model', 'model_has_permissions');
     }
+        public function borrowings($id)
+    {
+        $user = User::with(['lendingRecords.book'])->findOrFail($id);
+        return view('users.borrowings', compact('user'));
+    }
+
+        public function lendingRecords()
+    {
+        return $this->hasMany(\App\Models\LendingRecord::class);
+    }
 }

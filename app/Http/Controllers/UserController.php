@@ -79,4 +79,12 @@ class UserController extends Controller
         $user->delete();
         return back()->with('success', 'User berhasil dihapus.');
     }
+    
+    // app/Http/Controllers/UserController.php
+    public function borrowings($userId)
+    {
+        $user = \App\Models\User::with('lendings.book')->findOrFail($userId);
+        return view('users.borrowings', compact('user'));
+    }
+
 }

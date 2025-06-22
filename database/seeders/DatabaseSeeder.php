@@ -25,6 +25,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'), // Password default: 'password'
         ]);
 
+        $admin = User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'admin@admin.com',
+            'password' => bcrypt('password'), // Password default: 'password'
+        ]);
+
         // Berikan role admin
         $admin->assignRole($adminRole);
 

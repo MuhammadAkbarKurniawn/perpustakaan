@@ -24,7 +24,7 @@ Route::get('/dashboard', function () {
 // Admin & Librarian Routes
 // ------------------------
 Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
-    // Dashboard admin pakai controller
+    // Dashboard admin menggunakan controller
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Resource routes
@@ -36,6 +36,9 @@ Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
     // Role & permission management
     Route::get('/user-role', [UserRoleController::class, 'index'])->name('admin.user_role.index');
     Route::post('/user-role', [UserRoleController::class, 'assign'])->name('admin.user_role.assign');
+
+    // 👇 Route tambahan untuk melihat peminjaman berdasarkan user
+    Route::get('/users/{user}/borrowings', [UserController::class, 'borrowings'])->name('users.borrowings');
 });
 
 // ------------------------
@@ -55,5 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Auth routes (from Laravel Breeze or Fortify)
+// ------------------------
+// Auth (dari Laravel Breeze atau Fortify)
+// ------------------------
 require __DIR__.'/auth.php';
