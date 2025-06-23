@@ -144,9 +144,10 @@
                 <a href="{{ route('books.index') }}" class="{{ request()->routeIs('books.*') ? 'active' : '' }}">
                     <i class="fas fa-book"></i> Buku
                 </a>
-                <a href="{{ route('lendings.mine') }}" class="{{ request()->routeIs('lendings.mine') ? 'active' : '' }}">
-                    <i class="fas fa-book-reader"></i> Buku Saya
+                <a href="{{ route('lendings.my_books') }}" class="{{ request()->routeIs('lendings.my_books') ? 'active' : '' }}">
+                    <i class="fas fa-book-reader"></i> Buku yang Saya Pinjam
                 </a>
+
             @endrole
         </div>
         <div class="p-3 border-top">

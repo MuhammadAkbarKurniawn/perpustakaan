@@ -61,8 +61,10 @@ Route::middleware(['auth', 'role:admin|librarian|member'])->get('/books', [BookC
 // Member-only Routes
 // ------------------------
 Route::middleware(['auth', 'role:member'])->group(function () {
-    Route::get('/lendings/mine', [LendingController::class, 'myBorrowedBooks'])->name('lendings.mine');
+    Route::get('/my-books', [LendingController::class, 'myBorrowedBooks'])->name('lendings.my_books');
 });
+
+
 
 // ------------------------
 // Profile Routes (semua login user)
