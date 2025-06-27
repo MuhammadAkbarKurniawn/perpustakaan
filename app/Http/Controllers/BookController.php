@@ -13,7 +13,12 @@ class BookController extends Controller
     // Menampilkan semua buku
     public function index()
     {
-        $books = Book::paginate(10);
+       $books = Book::paginate(10); // atau sesuai kebutuhan
+
+        if (auth()->user()->hasRole('member')) {
+            return view('books.index_user', compact('books'));
+        }
+
         return view('books.index', compact('books'));
     }
 

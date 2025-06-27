@@ -24,11 +24,11 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // ------------------------
-// Admin & Librarian Routes
+// Admin &  Routes
 // ------------------------
-Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    // Dashboard admin/librarian
+    // Dashboard admin/
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // CRUD: Users, Books, Lendings, Roles
@@ -53,9 +53,9 @@ Route::middleware(['auth', 'role:admin|librarian'])->group(function () {
 });
 
 // ------------------------
-// Admin, Librarian, Member - Lihat Daftar Buku
+// Admin, , Member - Lihat Daftar Buku
 // ------------------------
-Route::middleware(['auth', 'role:admin|librarian|member'])->get('/books', [BookController::class, 'index'])->name('books.index');
+Route::middleware(['auth', 'role:admin|member'])->get('/books', [BookController::class, 'index'])->name('books.index');
 
 // ------------------------
 // Member-only Routes

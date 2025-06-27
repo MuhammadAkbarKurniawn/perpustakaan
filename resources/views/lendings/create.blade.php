@@ -1,41 +1,43 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Peminjaman Buku</h2>
+<div class="max-w-xl mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold text-blue-600 mb-6">📚 Peminjaman Buku</h2>
 
-    <form id="lendingForm" method="POST" action="{{ route('lendings.store') }}" novalidate>
+    <form id="lendingForm" method="POST" action="{{ route('lendings.store') }}" novalidate class="space-y-5 bg-white p-6 rounded shadow">
         @csrf
 
-        <div class="mb-3">
-            <label for="book_id">Pilih Buku</label>
-            <select name="book_id" class="form-control" required>
+        <div>
+            <label for="book_id" class="block text-sm font-medium text-gray-700 mb-1">Pilih Buku</label>
+            <select name="book_id" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200 invalid:border-red-500 invalid:text-red-600 peer" required>
                 <option value="">-- Pilih Buku --</option>
                 @foreach($books as $book)
                     <option value="{{ $book->id }}">{{ $book->title }} ({{ $book->available_copies }} tersedia)</option>
                 @endforeach
             </select>
-            <div class="invalid-feedback">Silakan pilih buku.</div>
+            <p class="mt-1 text-sm text-red-600 hidden peer-invalid:block">Silakan pilih buku.</p>
         </div>
 
-        <div class="mb-3">
-            <label for="user_id">Pilih Anggota</label>
-            <select name="user_id" class="form-control" required>
+        <div>
+            <label for="user_id" class="block text-sm font-medium text-gray-700 mb-1">Pilih Anggota</label>
+            <select name="user_id" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200 invalid:border-red-500 invalid:text-red-600 peer" required>
                 <option value="">-- Pilih Anggota --</option>
                 @foreach($users as $user)
                     <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                 @endforeach
             </select>
-            <div class="invalid-feedback">Silakan pilih anggota.</div>
+            <p class="mt-1 text-sm text-red-600 hidden peer-invalid:block">Silakan pilih anggota.</p>
         </div>
 
-        <div class="mb-3">
-            <label for="due_date">Tanggal Jatuh Tempo</label>
-            <input type="date" name="due_at" class="form-control" required>
-            <div class="invalid-feedback">Silakan pilih tanggal jatuh tempo yang valid.</div>
+        <div>
+            <label for="due_at" class="block text-sm font-medium text-gray-700 mb-1">Tanggal Jatuh Tempo</label>
+            <input type="date" name="due_at" class="w-full border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200 invalid:border-red-500 invalid:text-red-600 peer" required>
+            <p class="mt-1 text-sm text-red-600 hidden peer-invalid:block">Silakan pilih tanggal jatuh tempo yang valid.</p>
         </div>
 
-        <button type="submit" class="btn btn-primary">Pinjam Buku</button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-semibold">
+            Pinjam Buku
+        </button>
     </form>
 </div>
 
@@ -46,11 +48,9 @@
 
         const validateField = (field) => {
             if (!field.checkValidity()) {
-                field.classList.add('is-invalid');
-                field.classList.remove('is-valid');
+                field.classList.add('border-red-500', 'text-red-600');
             } else {
-                field.classList.remove('is-invalid');
-                field.classList.add('is-valid');
+                field.classList.remove('border-red-500', 'text-red-600');
             }
         };
 

@@ -1,389 +1,222 @@
 @extends('layouts.app')
+
 @hasanyrole('admin|librarian')
 @section('content')
-<div class="container-fluid">
-    <div class="card shadow-sm">
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-handshake me-2"></i>Manajemen Peminjaman</h5>
-            <a href="{{ route('lendings.create') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Pinjam Buku
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="bg-white shadow rounded-lg">
+        <div class="flex justify-between items-center px-6 py-4 border-b">
+            <h5 class="text-lg font-semibold"><i class="fas fa-handshake mr-2"></i>Manajemen Peminjaman</h5>
+            <a href="{{ route('lendings.create') }}" class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                <i class="fas fa-plus mr-1"></i> Pinjam Buku
             </a>
         </div>
-        
-        <div class="card-body">
+
+        <div class="px-6 py-4">
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                <div class="mb-4 p-4 bg-green-100 text-green-800 text-sm rounded">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
                 </div>
             @endif
-            
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" id="lendingSearch" class="form-control border-start-0" placeholder="Cari berdasarkan judul buku atau nama peminjam...">
-                    </div>
+
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+                <div class="flex items-center border rounded-md overflow-hidden">
+                    <span class="px-3 text-gray-500 bg-white border-r">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" id="lendingSearch" class="flex-1 py-2 px-3 text-sm focus:outline-none" placeholder="Cari berdasarkan judul buku atau nama peminjam...">
                 </div>
-                <div class="col-md-6">
-                    <div class="btn-group float-md-end">
-                        <button class="btn btn-outline-secondary filter-btn active" data-filter="all">Semua</button>
-                        <button class="btn btn-outline-secondary filter-btn" data-filter="borrowed">Sedang Dipinjam</button>
-                        <button class="btn btn-outline-secondary filter-btn" data-filter="returned">Dikembalikan</button>
-                        <button class="btn btn-outline-secondary filter-btn" data-filter="overdue">Terlambat</button>
-                    </div>
+                <div class="flex justify-end gap-2">
+                    <button class="filter-btn px-4 py-2 text-sm border rounded-md text-gray-700 hover:bg-gray-100 active" data-filter="all">Semua</button>
+                    <button class="filter-btn px-4 py-2 text-sm border rounded-md text-gray-700 hover:bg-gray-100" data-filter="borrowed">Sedang Dipinjam</button>
+                    <button class="filter-btn px-4 py-2 text-sm border rounded-md text-gray-700 hover:bg-gray-100" data-filter="returned">Dikembalikan</button>
+                    <button class="filter-btn px-4 py-2 text-sm border rounded-md text-gray-700 hover:bg-gray-100" data-filter="overdue">Terlambat</button>
                 </div>
             </div>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle" id="lendingsTable">
-                    <thead class="table-light">
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left text-gray-600">
+                    <thead class="text-xs text-gray-700 bg-gray-100 uppercase">
                         <tr>
-                            <th>Detail Buku</th>
-                            <th>Peminjam</th>
-                            <th>Periode Peminjaman</th>
-                            <th class="text-center" style="width: 120px">Status</th>
-                            <th class="text-end" style="width: 180px">Aksi</th>
+                            <th class="px-4 py-3">Detail Buku</th>
+                            <th class="px-4 py-3">Peminjam</th>
+                            <th class="px-4 py-3">Periode Peminjaman</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                    @forelse($lendings as $lend)
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($lendings as $lend)
                         @php
                             $isOverdue = !$lend->returned_at && \Carbon\Carbon::parse($lend->due_at)->isPast();
                             $status = $lend->returned_at ? 'returned' : ($isOverdue ? 'overdue' : 'borrowed');
                             $daysOverdue = $isOverdue ? \Carbon\Carbon::parse($lend->due_at)->diffInDays(now()) : 0;
                         @endphp
                         <tr data-status="{{ $status }}">
-                            <td>
-                                <div class="d-flex align-items-center">
+                            <td class="px-4 py-3">
+                                <div class="flex items-center">
                                     @if($lend->book->cover_image)
-                                        <img src="{{ asset('storage/' . $lend->book->cover_image) }}" alt="Cover" class="me-3 book-cover">
+                                        <img src="{{ asset('storage/' . $lend->book->cover_image) }}" alt="Cover" class="w-10 h-14 object-cover rounded mr-3">
                                     @else
-                                        <div class="no-cover me-3 d-flex align-items-center justify-content-center text-muted">
+                                        <div class="w-10 h-14 bg-gray-100 flex items-center justify-center rounded text-gray-400 mr-3">
                                             <i class="fas fa-book"></i>
                                         </div>
                                     @endif
                                     <div>
-                                        <strong>{{ $lend->book->title }}</strong>
-                                        <div class="text-muted small">{{ $lend->book->author }}</div>
+                                        <div class="font-semibold">{{ $lend->book->title }}</div>
+                                        <div class="text-xs text-gray-500">{{ $lend->book->author }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-avatar me-2">{{ substr($lend->user->name, 0, 1) }}</div>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center mr-2 text-sm font-bold">
+                                        {{ substr($lend->user->name, 0, 1) }}
+                                    </div>
                                     <div>
                                         {{ $lend->user->name }}
-                                        @if($lend->user->email)
-                                            <div class="text-muted small">{{ $lend->user->email }}</div>
-                                        @endif
+                                        <div class="text-xs text-gray-500">{{ $lend->user->email }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="lending-dates">
-                                    <div>
-                                        <span class="text-muted">Dipinjam:</span> 
-                                        <span class="ms-1">{{ $lend->created_at->format('d M Y') }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="text-muted">Jatuh Tempo:</span> 
-                                        <span class="ms-1 {{ $isOverdue && !$lend->returned_at ? 'text-danger fw-bold' : '' }}">
-                                            {{ \Carbon\Carbon::parse($lend->due_at)->format('d M Y') }}
-                                        </span>
-                                    </div>
-                                    @if($lend->returned_at)
-                                    <div>
-                                        <span class="text-muted">Dikembalikan:</span> 
-                                        <span class="ms-1">{{ \Carbon\Carbon::parse($lend->returned_at)->format('d M Y') }}</span>
-                                    </div>
-                                    @endif
+                            <td class="px-4 py-3 text-sm space-y-1">
+                                <div>
+                                    <span class="text-gray-500">Dipinjam:</span>
+                                    <span>{{ $lend->created_at->format('d M Y') }}</span>
                                 </div>
-                            </td>
-                            <td class="text-center">
+                                <div>
+                                    <span class="text-gray-500">Jatuh Tempo:</span>
+                                    <span class="{{ $isOverdue && !$lend->returned_at ? 'text-red-600 font-semibold' : '' }}">
+                                        {{ \Carbon\Carbon::parse($lend->due_at)->format('d M Y') }}
+                                    </span>
+                                </div>
                                 @if($lend->returned_at)
-                                    <span class="badge bg-success">Dikembalikan</span>
-                                @elseif($isOverdue)
-                                    <span class="badge bg-danger">Terlambat ({{ $daysOverdue }}h)</span>
-                                @else
-                                    <span class="badge bg-warning">Dipinjam</span>
+                                <div>
+                                    <span class="text-gray-500">Dikembalikan:</span>
+                                    <span>{{ \Carbon\Carbon::parse($lend->returned_at)->format('d M Y') }}</span>
+                                </div>
                                 @endif
                             </td>
-                            <td class="text-end">
+                            <td class="px-4 py-3 text-center">
+                                @if($lend->returned_at)
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Dikembalikan</span>
+                                @elseif($isOverdue)
+                                    <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">Terlambat ({{ $daysOverdue }}h)</span>
+                                @else
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Dipinjam</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-right">
                                 @if(!$lend->returned_at)
-                                    <form method="POST" action="{{ route('lendings.return', $lend->id) }}" class="d-inline">
-                                         @csrf
-                                        <button class="btn btn-sm btn-outline-success return-btn">
-                                            <i class="fas fa-undo me-1"></i> Kembalikan
+                                    <form method="POST" action="{{ route('lendings.return', $lend->id) }}" class="inline">
+                                        @csrf
+                                        <button class="text-green-600 hover:text-green-800 text-sm mr-2">
+                                            <i class="fas fa-undo"></i> Kembalikan
                                         </button>
                                     </form>
-                                    <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#extendModal{{ $lend->id }}">
+                                    <!-- Tombol Perpanjang -->
+                                    <button class="text-yellow-500 hover:text-yellow-700 text-sm" onclick="document.getElementById('extendModal{{ $lend->id }}').classList.remove('hidden')">
                                         <i class="fas fa-calendar-plus"></i>
                                     </button>
+
+                                    <!-- Modal Perpanjang -->
+                                    <div id="extendModal{{ $lend->id }}" class="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center hidden">
+                                        <div class="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+                                            <h2 class="text-lg font-semibold mb-4">Perpanjang Jatuh Tempo</h2>
+                                            <form action="{{ route('lendings.extend', $lend->id) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <div class="mb-4">
+                                                    <label for="due_at" class="block text-sm font-medium text-gray-700">Tanggal Baru</label>
+                                                    <input type="date" name="due_at" min="{{ date('Y-m-d') }}" value="{{ \Carbon\Carbon::parse($lend->due_at)->format('Y-m-d') }}" required class="mt-1 block w-full border border-gray-300 rounded px-3 py-2">
+                                                </div>
+                                                <div class="flex justify-end gap-2 mt-4">
+                                                    <button type="button" class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 text-sm" onclick="document.getElementById('extendModal{{ $lend->id }}').classList.add('hidden')">Batal</button>
+                                                    <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Simpan</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 @else
-                                    <span class="text-success"><i class="fas fa-check me-1"></i> Selesai</span>
+                                    <span class="text-green-600 text-sm"><i class="fas fa-check mr-1"></i> Selesai</span>
                                 @endif
                             </td>
                         </tr>
-                        
-                        <!-- Modal Perpanjang -->
-                        <div class="modal fade" id="extendModal{{ $lend->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-sm">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Perpanjang Jatuh Tempo</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                                    </div>
-                                    <form action="{{ route('lendings.extend', $lend->id) }}" method="POST">
-                                        @csrf
-                                        @method('PATCH')
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label for="due_at" class="form-label">Tanggal Baru</label>
-                                                <input type="date" class="form-control" id="due_at" name="due_at" 
-                                                    value="{{ \Carbon\Carbon::parse($lend->due_at)->format('Y-m-d') }}" min="{{ date('Y-m-d') }}">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-sm btn-primary">Simpan</button>
-                                        </div>
-                                    </form>
-
-                                </div>
-                            </div>
-                        </div>
-                    @empty
+                        @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <div class="d-flex flex-column align-items-center text-muted">
-                                    <i class="fas fa-handshake fa-3x mb-3"></i>
-                                    <h5>Tidak ada data peminjaman</h5>
-                                    <p>Belum terdapat data peminjaman buku di sistem.</p>
-                                    <a href="{{ route('lendings.create') }}" class="btn btn-primary btn-sm mt-2">
-                                        <i class="fas fa-plus me-1"></i> Tambah Peminjaman Pertama
+                            <td colspan="5" class="text-center px-4 py-6 text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-handshake fa-2x mb-2"></i>
+                                    <h5 class="font-semibold">Tidak ada data peminjaman</h5>
+                                    <p class="text-sm">Belum terdapat data peminjaman buku di sistem.</p>
+                                    <a href="{{ route('lendings.create') }}" class="mt-2 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                        <i class="fas fa-plus mr-1"></i> Tambah Peminjaman Pertama
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                    @endforelse
+                        @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted small">
-                    Menampilkan <span class="fw-semibold" id="visibleCount">{{ count($lendings) }}</span> dari {{ $lendings->total() }} data
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mt-6 text-sm text-gray-600">
+                <div>
+                    Menampilkan <span class="font-medium" id="visibleCount">{{ count($lendings) }}</span> dari {{ $lendings->total() }} data
                 </div>
-                <div class="pagination-container">
-                    @if ($lendings->hasPages())
-                        <nav>
-                            <ul class="pagination pagination-sm m-0">
-                                {{-- Sebelumnya --}}
-                                @if ($lendings->onFirstPage())
-                                    <li class="page-item disabled">
-                                        <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $lendings->previousPageUrl() }}"><i class="fas fa-chevron-left"></i></a>
-                                    </li>
-                                @endif
-
-                                {{-- Halaman --}}
-                                @foreach ($lendings->getUrlRange(max($lendings->currentPage() - 2, 1), 
-                                                          min($lendings->currentPage() + 2, $lendings->lastPage())) as $page => $url)
-                                    @if ($page == $lendings->currentPage())
-                                        <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
-                                    @else
-                                        <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
-                                    @endif
-                                @endforeach
-
-                                {{-- Selanjutnya --}}
-                                @if ($lendings->hasMorePages())
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $lendings->nextPageUrl() }}"><i class="fas fa-chevron-right"></i></a>
-                                    </li>
-                                @else
-                                    <li class="page-item disabled">
-                                        <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                                    </li>
-                                @endif
-                            </ul>
-                        </nav>
-                    @endif
+                <div class="mt-4 md:mt-0">
+                    {{ $lendings->links() }}
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
-
-<style>
-    .book-cover {
-        width: 40px;
-        height: 55px;
-        object-fit: cover;
-        border-radius: 3px;
-    }
-    
-    .no-cover {
-        width: 40px;
-        height: 55px;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 3px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .user-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: #4361ee;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-    
-    .filter-btn.active {
-        background-color: #4361ee;
-        color: white;
-        border-color: #4361ee;
-    }
-    
-    .return-btn:hover {
-        background-color: #28a745;
-        color: white;
-    }
-    
-    .lending-dates .text-muted {
-        width: 50px;
-        display: inline-block;
-    }
-
-
-    .pagination-container {
-    margin-left: auto;
-}
-
-.pagination {
-    margin-bottom: 0;
-}
-
-.pagination .page-item .page-link {
-    color: #4361ee;
-    border-radius: 3px;
-    margin: 0 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    height: 32px;
-    padding: 0 10px;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #4361ee;
-    border-color: #4361ee;
-    color: white;
-}
-
-.pagination .page-item.disabled .page-link {
-    color: #6c757d;
-}
-
-.pagination .page-item .page-link:focus {
-    box-shadow: 0 0 0 0.15rem rgba(67, 97, 238, 0.25);
-}
-</style>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality
-        const searchInput = document.getElementById('lendingSearch');
-        const table = document.getElementById('lendingsTable');
-        const rows = table.querySelectorAll('tbody tr:not([data-empty])');
-        
-        // Update visible count function
-        function updateVisibleCount() {
-            const visibleRows = table.querySelectorAll('tbody tr:not([style*="display: none"]):not([data-empty])');
-            document.getElementById('visibleCount').textContent = visibleRows.length;
-        }
-        
-        // Search filter
-        searchInput.addEventListener('keyup', function() {
-            const query = this.value.toLowerCase();
-            let visibleCount = 0;
-            
-            rows.forEach(row => {
-                const bookTitle = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                const borrowerName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                
-                if (bookTitle.includes(query) || borrowerName.includes(query)) {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            
-            updateVisibleCount();
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('lendingSearch');
+    const rows = document.querySelectorAll('tbody tr[data-status]');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    let activeFilter = 'all';
+
+    function filterRows() {
+        const keyword = searchInput.value.toLowerCase();
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const status = row.dataset.status;
+
+            const matchKeyword = text.includes(keyword);
+            const matchStatus = (activeFilter === 'all') || (status === activeFilter);
+
+            if (matchKeyword && matchStatus) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
         });
-        
-        // Status filter
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const filter = this.getAttribute('data-filter');
-                
-                // Update active button
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Filter rows
-                rows.forEach(row => {
-                    const status = row.getAttribute('data-status');
-                    if (filter === 'all' || status === filter) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-                
-                updateVisibleCount();
-            });
-        });
-        
-        // Auto-dismiss alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                const closeButton = alert.querySelector('.btn-close');
-                if (closeButton) {
-                    closeButton.click();
-                }
-            }, 5000);
-        });
-        
-        // Confirm return action
-        const returnForms = document.querySelectorAll('form[action*="lendings.return"]');
-        returnForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                if (!confirm('Are you sure you want to mark this book as returned?')) {
-                    e.preventDefault();
-                }
-            });
+
+        // Update jumlah tampilan
+        document.getElementById('visibleCount').textContent = visibleCount;
+    }
+
+    searchInput.addEventListener('input', filterRows);
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Set semua tombol nonaktif dulu
+            filterButtons.forEach(b => b.classList.remove('bg-blue-600', 'text-white', 'active'));
+            // Aktifkan tombol yang diklik
+            btn.classList.add('bg-blue-600', 'text-white', 'active');
+            activeFilter = btn.dataset.filter;
+            filterRows();
         });
     });
+});
 </script>
+
+
 @endsection
 @endhasanyrole
